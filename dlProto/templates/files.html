@@ -1,0 +1,17 @@
+{{ define "pageTitle" }} Files Menu {{ end }}
+
+{{ define "content" }}
+<p>These are the files currently stored on the server.</p>
+<ol>
+  {{ range $index, $value := .Files }}
+  <li>
+    <a href="/file/{{ $value.Name }}">
+      <h3>Name: {{ $value.Name }}</h3>
+      <p>Size: {{ $value.Size }} bytes</p>
+      <p>Last Modified: {{ $value.ModTime }}</p>
+    </a>
+  </li>
+  {{ end }}
+</ul>
+<p><a href="/">&lt;-return to main menu</a></p>
+{{ end }}

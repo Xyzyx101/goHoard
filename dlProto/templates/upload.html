@@ -1,0 +1,15 @@
+{{ define "pageTitle" }} Upload Files {{ end }}
+
+{{ define "content" }}
+<p>Choose a file to add to the collection</p>
+<p>
+  <form
+     id="uploadForm"
+     method="post"
+     enctype="multipart/form-data"
+     action="/uploadFile">
+    <input type="file" name="fileName" size="80" required />
+    <input type="submit" value="Send" />
+  </form>
+</p>
+{{ end }}

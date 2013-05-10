@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"code.google.com/p/goconf/conf"
 )
 
 var fileLocation = "/home/andrew/code/tuig/files/"
@@ -23,6 +24,11 @@ var filesPage = template.Must(template.ParseFiles(
 var uploadPage = template.Must(template.ParseFiles(
 	"templates/_base.html",
 	"templates/upload.html",
+))
+
+var thanksPage = template.Must(template.ParseFiles(
+	"templates/_base.html",
+	"templates/thanks.html",
 ))
 
 func index(w http.ResponseWriter, req *http.Request) {
@@ -70,27 +76,45 @@ func upload(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func submitUpload(w http.ResponseWriter, req *http.Request) {
-	formFile, fileHeader, err := req.FormFile("fileName")
+func thanks(w http.ResponseWriter, req *http.Request) {
+	if err :=thanksPage.Execute(w, nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+type configValues struct {
+	host string
+	port string
+}
+
+func parseConfigFile(file string) (configValues, error) {
+	var config configValues
+
+	c, err := conf.ReadConfigFile(file); 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return config, err
 	}
-	fileName := fileLocation + fileHeader.Filename
 	
-	var filePerm os.FileMode = 0664
-	
-	fileBuffer, err :=ioutil.ReadAll(formFile)
+	config.host, err = c.GetString("server", "host")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return config, err
 	}
 	
-	if err := ioutil.WriteFile(fileName, fileBuffer, filePerm); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	config.port, err = c.GetString("server", "port")
+	if err != nil {
+		return config, err
 	}
-	http.Redirect(w, req, "/", http.StatusSeeOther)
+		
+	return config, err
 }
 
 func main() {
+	
+	config, err := parseConfigFile("webserver.conf")
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	
 	http.HandleFunc("/", index)
 	
@@ -101,9 +125,10 @@ func main() {
 
 	http.HandleFunc("/upload/", upload)
 
-	http.HandleFunc("/uploadFile", submitUpload)
+	http.HandleFunc("/thanks/", thanks)
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Printf("Webserver started %s:%s\n", config.host, config.port)
+	if err := http.ListenAndServe(config.host + ":" + config.port, nil); err != nil {
 		panic(err)
 	}
 }

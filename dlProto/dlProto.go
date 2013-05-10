@@ -109,30 +109,30 @@ func parseConfigFile(file string) (configValues, error) {
 
 func parseTemplates() error {
 	tmpl.index = template.Must(template.ParseFiles(
-		"templates/_base.html",
-		"templates/index.html",
+		config.templates + "/_base.html",
+		config.templates + "/index.html",
 	))
 
 	tmpl.files = template.Must(template.ParseFiles(
-		"templates/_base.html",
-		"templates/files.html",
+		config.templates + "/_base.html",
+		config.templates + "/files.html",
 	))
 
 	tmpl.upload = template.Must(template.ParseFiles(
-		"templates/_base.html",
-		"templates/upload.html",
+		config.templates + "/_base.html",
+		config.templates + "/upload.html",
 	))
 
 	tmpl.thanks = template.Must(template.ParseFiles(
-		"templates/_base.html",
-		"templates/thanks.html",
+		config.templates + "/_base.html",
+		config.templates + "/thanks.html",
 	))
 	return nil
 }
 
 func main() {
 
-	config, err := parseConfigFile("webserver.conf")
+	config, err := parseConfigFile("../webserver.conf")
 	if err != nil {
 		fmt.Println(err.Error())
 		return

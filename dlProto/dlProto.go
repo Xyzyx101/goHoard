@@ -132,7 +132,7 @@ func parseTemplates() error {
 
 func main() {
 
-	config, err := parseConfigFile("../webserver.conf")
+	config, err := parseConfigFile("../server.conf")
 	if err != nil {
 		fmt.Println(err.Error())
 		return

@@ -24,3 +24,7 @@ _testmain.go
 # emacs temp files
 [#]*[#]
 .\[#]*[#]
+
+# I'm not even sure what creates these files but I don't want them
+.#*
+*/.#dlProto.go

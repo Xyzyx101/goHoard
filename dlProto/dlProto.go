@@ -84,12 +84,12 @@ func parseConfigFile(file string) (configValues, error) {
 		return config, err
 	}
 
-	config.host, err = c.GetString("server", "host")
+	config.host, err = c.GetString("webserver", "host")
 	if err != nil {
 		return config, err
 	}
 
-	config.port, err = c.GetString("server", "port")
+	config.port, err = c.GetString("webserver", "port")
 	if err != nil {
 		return config, err
 	}

@@ -1,21 +1,15 @@
 package main
 
 import (
-	"code.google.com/p/goconf/conf"
 	"fmt"
+	"github.com/Xyzyx101/goHoard/config"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
 )
 
-type configValues struct {
-	host      string
-	port      string
-	uploadDir string
-	templates string
-}
-var config configValues
+var conf config.Config
 
 type templates struct {
 	index  *template.Template
@@ -23,6 +17,7 @@ type templates struct {
 	files  *template.Template
 	thanks *template.Template
 }
+
 var tmpl templates
 
 func index(w http.ResponseWriter, req *http.Request) {
@@ -33,7 +28,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 
 func filesHandler(w http.ResponseWriter, req *http.Request) {
 	files := make([]os.FileInfo, 100)
-	files, err := ioutil.ReadDir(config.uploadDir)
+	files, err := ioutil.ReadDir(conf["dir"]["upload"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -50,7 +45,7 @@ func filesHandler(w http.ResponseWriter, req *http.Request) {
 type ServeFileHandler struct{}
 
 func (fh ServeFileHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	fileName := config.uploadDir + "/" + req.URL.Path
+	fileName := conf["dir"]["upload"] + "/" + req.URL.Path
 
 	fileBuffer, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -77,67 +72,37 @@ func thanks(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func parseConfigFile(file string) (configValues, error) {
-
-	c, err := conf.ReadConfigFile(file)
-	if err != nil {
-		return config, err
-	}
-
-	config.host, err = c.GetString("webserver", "host")
-	if err != nil {
-		return config, err
-	}
-
-	config.port, err = c.GetString("webserver", "port")
-	if err != nil {
-		return config, err
-	}
-
-	config.uploadDir, err = c.GetString("directories", "uploadDir")
-	if err != nil {
-		return config, err
-	}
-
-	config.templates, err = c.GetString("directories", "templates")
-	if err != nil {
-		return config, err
-	}
-
-	return config, err
-}
-
 func parseTemplates() error {
 	tmpl.index = template.Must(template.ParseFiles(
-		config.templates + "/_base.html",
-		config.templates + "/index.html",
+		conf["dir"]["template"]+"/_base.html",
+		conf["dir"]["template"]+"/index.html",
 	))
 
 	tmpl.files = template.Must(template.ParseFiles(
-		config.templates + "/_base.html",
-		config.templates + "/files.html",
+		conf["dir"]["template"]+"/_base.html",
+		conf["dir"]["template"]+"/files.html",
 	))
 
 	tmpl.upload = template.Must(template.ParseFiles(
-		config.templates + "/_base.html",
-		config.templates + "/upload.html",
+		conf["dir"]["template"]+"/_base.html",
+		conf["dir"]["template"]+"/upload.html",
 	))
 
 	tmpl.thanks = template.Must(template.ParseFiles(
-		config.templates + "/_base.html",
-		config.templates + "/thanks.html",
+		conf["dir"]["template"]+"/_base.html",
+		conf["dir"]["template"]+"/thanks.html",
 	))
 	return nil
 }
 
 func main() {
-
-	config, err := parseConfigFile("../server.conf")
+	var err error
+	conf, err = config.ParseFile("../server.conf")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	
+
 	if err := parseTemplates(); err != nil {
 		fmt.Println(err.Error())
 		return
@@ -154,8 +119,8 @@ func main() {
 
 	http.HandleFunc("/thanks/", thanks)
 
-	fmt.Printf("Webserver started %s:%s\n", config.host, config.port)
-	if err := http.ListenAndServe(config.host+":"+config.port, nil); err != nil {
+	fmt.Printf("Webserver started %s:%s\n", conf["webserver"]["host"], conf["webserver"]["port"])
+	if err := http.ListenAndServe(conf["webserver"]["host"]+":"+conf["webserver"]["port"], nil); err != nil {
 		panic(err)
 	}
 }

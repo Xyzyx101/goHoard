@@ -25,6 +25,7 @@ _testmain.go
 [#]*[#]
 .\[#]*[#]
 
-# I'm not even sure what creates these files but I don't want them
-.#*
-*/.#dlProto.go
+#binaries
+./hoardWeb/hoardWeb
+./hoardUpload/hoardUpload
+./hoardData/hoardData

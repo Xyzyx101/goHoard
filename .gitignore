@@ -26,6 +26,6 @@ _testmain.go
 .\[#]*[#]
 
 #binaries
-./hoardWeb/hoardWeb
-./hoardUpload/hoardUpload
-./hoardData/hoardData
+hoardWeb/hoardWeb
+hoardUpload/hoardUpload
+hoardData/hoardData

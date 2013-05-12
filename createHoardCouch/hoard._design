@@ -1,0 +1,12 @@
+{
+  "_id" : "_design/assets",
+  "views" : {
+    "assets_by_id" : {
+      "map" : ""
+    },
+    "assets_by_title" : {
+      "map" : ""
+    }
+  }
+}
+

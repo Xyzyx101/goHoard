@@ -29,3 +29,4 @@ _testmain.go
 hoardWeb/hoardWeb
 hoardUpload/hoardUpload
 hoardData/hoardData
+createHoardCouch/createHoardCouch
